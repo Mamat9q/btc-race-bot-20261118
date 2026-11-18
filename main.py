@@ -71,7 +71,9 @@ def on_batch(state, batch):
     if held is not None:
         if close > _peak:
             _peak = close
-        if close * 10000 <= _peak * (10000 - TRAIL_BPS) or _since >= MAX_HOLD:
+        trailing_hit = close * 10000 <= _peak * (10000 - TRAIL_BPS)
+        held_too_long = _since >= MAX_HOLD
+        if trailing_hit or held_too_long:
             _peak = 0
             return [{"side": "sell", "symbol": SYMBOL, "qty": held.qty,
                      "max_slippage_bps": MAX_SLIPPAGE_BPS}]
